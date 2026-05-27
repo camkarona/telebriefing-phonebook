@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>텔레브리핑 교민 전화번호부</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="app-header sticky top-0 z-10">
+    <div class="px-4 pt-3 pb-2">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xl">📞</span>
+        <div>
+          <h1 class="text-base font-bold leading-tight" style="color: var(--tg-theme-text-color)">교민 전화번호부</h1>
+          <p class="text-xs" style="color: var(--tg-theme-hint-color)">텔레브리핑 캄보디아</p>
+        </div>
+      </div>
+
+      <!-- 검색창 -->
+      <div class="relative">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="기관명 검색 (초성 가능: ㄷㅅㄱ)"
+          class="search-input w-full px-4 py-2 pl-9 rounded-xl text-sm outline-none"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+        <svg class="absolute left-2.5 top-2.5 w-4 h-4" style="color: var(--tg-theme-hint-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <button id="clearSearch" class="absolute right-2.5 top-2 hidden text-lg leading-none" style="color: var(--tg-theme-hint-color)">✕</button>
+      </div>
+    </div>
+
+    <!-- 카테고리 탭 -->
+    <div id="categoryTabs" class="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <!-- JS에서 생성 -->
+    </div>
+  </header>
+
+  <!-- 결과 카운트 -->
+  <div id="resultCount" class="px-4 py-1.5 text-xs" style="color: var(--tg-theme-hint-color)"></div>
+
+  <!-- 메인 리스트 -->
+  <main class="px-4 pb-6">
+
+    <!-- 로딩 -->
+    <div id="loading" class="flex flex-col items-center justify-center py-16 gap-3">
+      <div class="spinner"></div>
+      <p class="text-sm" style="color: var(--tg-theme-hint-color)">데이터 불러오는 중...</p>
+    </div>
+
+    <!-- 연락처 목록 -->
+    <div id="contactList" class="space-y-2 hidden"></div>
+
+    <!-- 검색 결과 없음 -->
+    <div id="emptyState" class="hidden text-center py-16">
+      <p class="text-4xl mb-3">🔍</p>
+      <p class="font-medium" style="color: var(--tg-theme-text-color)">검색 결과가 없습니다</p>
+      <p class="text-sm mt-1" style="color: var(--tg-theme-hint-color)">다른 검색어를 입력해보세요</p>
+    </div>
+
+    <!-- 오류 -->
+    <div id="errorState" class="hidden text-center py-16">
+      <p class="text-4xl mb-3">⚠️</p>
+      <p class="font-medium" style="color: var(--tg-theme-text-color)">데이터를 불러올 수 없습니다</p>
+      <p class="text-sm mt-1" style="color: var(--tg-theme-hint-color)">인터넷 연결을 확인하고<br>잠시 후 다시 시도해주세요</p>
+      <button onclick="loadData()" class="mt-4 px-5 py-2 rounded-xl text-sm font-medium retry-btn">
+        다시 시도
+      </button>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

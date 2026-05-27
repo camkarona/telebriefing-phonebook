@@ -1,0 +1,287 @@
+// ==========================================
+// 설정
+// ==========================================
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTVG7qHLYUmPSUdKcuQExcwskxE2Pi76S5Yz42B7EyTAZZ56dUgBBFMGRl_L46iCJTdmK6trX6Z_M7E/pub?gid=0&single=true&output=csv';
+const CACHE_KEY = 'telebriefing_v1_data';
+const CACHE_TIME_KEY = 'telebriefing_v1_time';
+const CACHE_TTL = 1000 * 60 * 30; // 30분
+
+// 카테고리 정의 (코드 → 표시명)
+const CATEGORIES = [
+  { code: 'all',           label: '전체' },
+  { code: 'public',        label: '주요기관' },
+  { code: 'education',     label: '교육기관' },
+  { code: 'religion',      label: '종교·NGO' },
+  { code: 'bank',          label: '은행·법인' },
+  { code: 'textile',       label: '봉제' },
+  { code: 'construction',  label: '건설·전기' },
+  { code: 'realestate',    label: '부동산' },
+  { code: 'farm',          label: '농장·농업' },
+  { code: 'logistics',     label: '차량·물류' },
+  { code: 'food_dist',     label: '식품·유통' },
+  { code: 'medical',       label: '병원·약국' },
+  { code: 'beauty',        label: '미용·마사지' },
+  { code: 'travel',        label: '여행·골프' },
+  { code: 'entertainment', label: '노래방' },
+  { code: 'restaurant',    label: '식당·치킨' },
+  { code: 'service',       label: '기타서비스' },
+  { code: 'club',          label: '동호회' },
+  { code: 'siemreap',      label: '시엠립' },
+  { code: 'media',         label: '언론·미디어' },
+];
+
+// ==========================================
+// 초성 검색 유틸리티
+// ==========================================
+const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+function getChosung(str) {
+  let result = '';
+  for (const ch of str) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3) {
+      result += CHOSUNG_LIST[Math.floor((code - 0xAC00) / 588)];
+    } else {
+      result += ch;
+    }
+  }
+  return result;
+}
+
+function isChosungOnly(str) {
+  return [...str].every(c => CHOSUNG_LIST.includes(c));
+}
+
+function matchSearch(query, target) {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  const t = (target || '').toLowerCase();
+  if (t.includes(q)) return true;
+  if (isChosungOnly(query)) {
+    return getChosung(target).includes(query);
+  }
+  return false;
+}
+
+// ==========================================
+// 텔레그램 SDK 초기화
+// ==========================================
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+function haptic() {
+  tg?.HapticFeedback?.impactOccurred('light');
+}
+
+// ==========================================
+// 상태
+// ==========================================
+let allData = [];
+let currentCategory = 'all';
+let currentQuery = '';
+
+// ==========================================
+// 카테고리 탭 렌더링
+// ==========================================
+function renderCategoryTabs() {
+  const usedCodes = new Set(allData.map(r => r.category?.trim()).filter(Boolean));
+  const tabs = CATEGORIES.filter(c => c.code === 'all' || usedCodes.has(c.code));
+
+  const container = document.getElementById('categoryTabs');
+  container.innerHTML = tabs.map(cat => `
+    <button
+      class="category-tab flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${currentCategory === cat.code ? 'tab-active' : 'tab-inactive'}"
+      data-code="${cat.code}"
+    >${cat.label}</button>
+  `).join('');
+
+  container.querySelectorAll('.category-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      haptic();
+      selectCategory(btn.dataset.code);
+    });
+  });
+}
+
+function selectCategory(code) {
+  currentCategory = code;
+  document.querySelectorAll('.category-tab').forEach(btn => {
+    const active = btn.dataset.code === code;
+    btn.className = `category-tab flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${active ? 'tab-active' : 'tab-inactive'}`;
+  });
+  renderList();
+}
+
+// ==========================================
+// 연락처 카드 렌더링
+// ==========================================
+function renderList() {
+  const list = document.getElementById('contactList');
+  const empty = document.getElementById('emptyState');
+  const countEl = document.getElementById('resultCount');
+
+  let filtered = allData;
+
+  if (currentCategory !== 'all') {
+    filtered = filtered.filter(r => r.category?.trim() === currentCategory);
+  }
+
+  if (currentQuery) {
+    filtered = filtered.filter(r =>
+      matchSearch(currentQuery, r.name) ||
+      matchSearch(currentQuery, r.description) ||
+      (r.phone || '').replace(/[\s-]/g, '').includes(currentQuery.replace(/[\s-]/g, ''))
+    );
+  }
+
+  // 결과 카운트
+  countEl.textContent = filtered.length > 0 ? `총 ${filtered.length}개` : '';
+
+  if (filtered.length === 0) {
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  list.classList.remove('hidden');
+  empty.classList.add('hidden');
+
+  list.innerHTML = filtered.map(item => {
+    const phone = (item.phone || '').trim();
+    const telPhone = phone.replace(/[\s-]/g, '');
+    const hasMap = (item.map_url || '').trim().length > 0;
+
+    const catInfo = CATEGORIES.find(c => c.code === item.category?.trim());
+    const catLabel = catInfo ? catInfo.label : (item.category || '');
+
+    return `
+    <div class="contact-card rounded-2xl p-3.5">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <p class="font-semibold text-sm leading-snug" style="color: var(--tg-theme-text-color)">${escapeHtml(item.name)}</p>
+            ${catLabel && currentCategory === 'all' ? `<span class="cat-badge text-xs px-1.5 py-0.5 rounded-md">${catLabel}</span>` : ''}
+          </div>
+          ${item.description ? `<p class="text-xs mt-0.5 truncate" style="color: var(--tg-theme-hint-color)">${escapeHtml(item.description)}</p>` : ''}
+          ${phone ? `<p class="text-xs mt-1 font-medium" style="color: var(--tg-theme-link-color)">${escapeHtml(phone)}</p>` : ''}
+        </div>
+        <div class="flex gap-2 flex-shrink-0 mt-0.5">
+          ${phone ? `
+            <a href="tel:${telPhone}"
+               class="action-btn call-btn flex items-center justify-center w-10 h-10 rounded-xl text-lg"
+               onclick="haptic()">
+              📞
+            </a>
+          ` : ''}
+          ${hasMap ? `
+            <a href="${escapeHtml(item.map_url)}" target="_blank" rel="noopener"
+               class="action-btn map-btn flex items-center justify-center w-10 h-10 rounded-xl text-lg">
+              📍
+            </a>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ==========================================
+// 데이터 로드 (Stale-While-Revalidate)
+// ==========================================
+async function loadData() {
+  const loading = document.getElementById('loading');
+  const errorState = document.getElementById('errorState');
+  const list = document.getElementById('contactList');
+
+  loading.classList.remove('hidden');
+  errorState.classList.add('hidden');
+  list.classList.add('hidden');
+
+  // 1) 캐시에서 즉시 표시
+  const cached = localStorage.getItem(CACHE_KEY);
+  const cachedTime = parseInt(localStorage.getItem(CACHE_TIME_KEY) || '0');
+
+  if (cached) {
+    try {
+      allData = JSON.parse(cached);
+      if (allData.length > 0) {
+        loading.classList.add('hidden');
+        renderCategoryTabs();
+        renderList();
+      }
+    } catch (e) {
+      console.warn('캐시 파싱 오류:', e);
+    }
+  }
+
+  // 2) 백그라운드에서 최신 데이터 fetch
+  try {
+    const res = await fetch(SHEET_URL + '&t=' + Date.now()); // 캐시 우회
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+
+    const result = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: h => h.trim(),
+      transform: v => (v || '').trim(),
+    });
+
+    const fresh = result.data.filter(r => r.name && r.phone);
+
+    localStorage.setItem(CACHE_KEY, JSON.stringify(fresh));
+    localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+
+    allData = fresh;
+    loading.classList.add('hidden');
+    renderCategoryTabs();
+    renderList();
+
+  } catch (err) {
+    console.error('데이터 로드 실패:', err);
+    loading.classList.add('hidden');
+
+    if (allData.length === 0) {
+      // 캐시도 없으면 오류 화면
+      errorState.classList.remove('hidden');
+    }
+    // 캐시가 있으면 기존 데이터 유지 (조용히 실패)
+  }
+}
+
+// ==========================================
+// 검색 핸들러
+// ==========================================
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+
+searchInput.addEventListener('input', e => {
+  currentQuery = e.target.value.trim();
+  clearBtn.classList.toggle('hidden', currentQuery.length === 0);
+  renderList();
+});
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  currentQuery = '';
+  clearBtn.classList.add('hidden');
+  searchInput.focus();
+  renderList();
+});
+
+// ==========================================
+// 시작
+// ==========================================
+loadData();
