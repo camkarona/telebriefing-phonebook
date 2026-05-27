@@ -28,6 +28,7 @@ const CATEGORIES = [
   { code: 'club',          label: '동호회' },
   { code: 'siemreap',      label: '시엠립' },
   { code: 'media',         label: '언론·미디어' },
+  { code: 'ngo',           label: 'NGO·개발' },
 ];
 
 // ==========================================
