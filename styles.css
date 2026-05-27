@@ -177,17 +177,54 @@ html, body {
   font-size: 13px !important;
 }
 
-/* 전화번호 (클릭 가능한 링크) */
+/* 전화번호 (터치하여 복사) */
 .phone-number-link {
   color: var(--brand-blue) !important;
   font-size: 14px !important;
   font-weight: 600 !important;
-  text-decoration: none;
-  padding: 2px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 0;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .phone-number-link:active {
-  opacity: 0.6;
+  opacity: 0.5;
+}
+
+.copy-hint {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-hint);
+  opacity: 0.8;
+}
+
+/* 복사 토스트 알림 */
+.copy-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: var(--brand-navy);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(27, 58, 107, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* 카테고리 배지 */

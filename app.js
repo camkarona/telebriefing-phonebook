@@ -176,9 +176,11 @@ function renderList() {
       const telPhone = phone.replace(/[\s-]/g, '');
       return `
         <div class="flex items-center justify-between mt-${idx === 0 ? '1.5' : '1'} gap-2">
-          <a href="tel:${telPhone}" class="phone-number-link text-xs font-medium" onclick="haptic()">
+          <span class="phone-number-link text-xs font-medium"
+                onclick="copyPhone('${telPhone}', '${escapeHtml(phone)}')">
             ${escapeHtml(phone)}
-          </a>
+            <span class="copy-hint">터치하여 복사</span>
+          </span>
           <a href="tel:${telPhone}"
              class="action-btn call-btn flex items-center justify-center w-8 h-8 rounded-xl text-base flex-shrink-0"
              onclick="haptic()">
@@ -209,6 +211,57 @@ function renderList() {
     </div>
     `;
   }).join('');
+}
+
+// ==========================================
+// 전화번호 복사
+// ==========================================
+function copyPhone(telPhone, displayPhone) {
+  haptic();
+  const text = displayPhone || telPhone;
+
+  // 클립보드 복사 시도
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast(text));
+  } else {
+    // 구형 방식 fallback
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand('copy');
+      showToast(text);
+    } catch (e) {
+      showToast(text, false);
+    }
+    document.body.removeChild(el);
+  }
+}
+
+function showToast(phone, success = true) {
+  // 기존 토스트 제거
+  const old = document.getElementById('copyToast');
+  if (old) old.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'copyToast';
+  toast.className = 'copy-toast';
+  toast.innerHTML = success
+    ? `📋 <strong>${phone}</strong> 복사됨!`
+    : `📋 ${phone}`;
+  document.body.appendChild(toast);
+
+  // 애니메이션
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  });
 }
 
 function escapeHtml(str) {
