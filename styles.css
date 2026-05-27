@@ -1,28 +1,19 @@
 /* ==========================================
-   텔레그램 테마 CSS 변수 기본값 (브라우저 미리보기용)
-   실제 텔레그램 앱 안에서는 SDK가 자동으로 덮어씀
+   텔레브리핑 브랜드 컬러 (다크모드 무시, 항상 밝은 테마)
    ========================================== */
 :root {
-  --tg-theme-bg-color:            #ffffff;
-  --tg-theme-text-color:          #1a1a1a;
-  --tg-theme-hint-color:          #999999;
-  --tg-theme-link-color:          #2481cc;
-  --tg-theme-button-color:        #2481cc;
-  --tg-theme-button-text-color:   #ffffff;
-  --tg-theme-secondary-bg-color:  #f4f4f5;
-}
+  --brand-navy:     #1B3A6B;   /* 로고 진한 네이비 */
+  --brand-blue:     #4A9FD5;   /* 로고 하늘색 */
+  --brand-light:    #EBF4FB;   /* 연한 하늘 배경 */
+  --brand-yellow:   #FFD600;   /* 전화번호부 배지 노랑 */
 
-/* 다크 모드 감지 (텔레그램 외 브라우저 환경용) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --tg-theme-bg-color:            #1c1c1e;
-    --tg-theme-text-color:          #f2f2f7;
-    --tg-theme-hint-color:          #8e8e93;
-    --tg-theme-link-color:          #64b5f6;
-    --tg-theme-button-color:        #2481cc;
-    --tg-theme-button-text-color:   #ffffff;
-    --tg-theme-secondary-bg-color:  #2c2c2e;
-  }
+  --bg:             #F0F7FC;   /* 전체 배경 */
+  --surface:        #FFFFFF;   /* 카드 배경 */
+  --header-bg:      #FFFFFF;
+  --text-primary:   #1B3A6B;   /* 메인 텍스트 - 네이비 */
+  --text-secondary: #5A7A9A;   /* 보조 텍스트 */
+  --text-hint:      #8BAABF;   /* 힌트 텍스트 */
+  --border:         rgba(74, 159, 213, 0.15);
 }
 
 /* ==========================================
@@ -33,41 +24,57 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-body {
-  background-color: var(--tg-theme-bg-color);
-  color: var(--tg-theme-text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+html, body {
+  /* 텔레그램 테마 변수 강제 무시 */
+  background-color: var(--bg) !important;
+  color: var(--text-primary) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  font-size: 15px;
 }
 
 /* ==========================================
    헤더
    ========================================== */
 .app-header {
-  background-color: var(--tg-theme-bg-color);
-  border-bottom: 1px solid rgba(128, 128, 128, 0.12);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: var(--header-bg) !important;
+  border-bottom: 2px solid var(--brand-light);
+  box-shadow: 0 2px 12px rgba(27, 58, 107, 0.08);
+}
+
+/* 헤더 타이틀 */
+.app-header h1 {
+  color: var(--brand-navy) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+.app-header p {
+  color: var(--brand-blue) !important;
+  font-size: 12px !important;
+  font-weight: 500;
 }
 
 /* ==========================================
    검색창
    ========================================== */
 .search-input {
-  background-color: var(--tg-theme-secondary-bg-color);
-  color: var(--tg-theme-text-color);
-  border: none;
-  transition: box-shadow 0.2s;
+  background-color: var(--brand-light) !important;
+  color: var(--brand-navy) !important;
+  border: 1.5px solid transparent;
+  font-size: 14px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-input::placeholder {
-  color: var(--tg-theme-hint-color);
+  color: var(--text-hint) !important;
 }
 
 .search-input:focus {
-  box-shadow: 0 0 0 2px var(--tg-theme-button-color);
+  border-color: var(--brand-blue) !important;
+  box-shadow: 0 0 0 3px rgba(74, 159, 213, 0.15) !important;
   outline: none;
 }
 
@@ -83,14 +90,15 @@ body {
 }
 
 .tab-active {
-  background-color: var(--tg-theme-button-color);
-  color: var(--tg-theme-button-text-color);
-  box-shadow: 0 2px 8px rgba(36, 129, 204, 0.35);
+  background-color: var(--brand-navy) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(27, 58, 107, 0.3);
 }
 
 .tab-inactive {
-  background-color: var(--tg-theme-secondary-bg-color);
-  color: var(--tg-theme-hint-color);
+  background-color: var(--brand-light) !important;
+  color: var(--brand-navy) !important;
+  border: 1px solid var(--border);
 }
 
 .tab-inactive:active {
@@ -98,51 +106,87 @@ body {
 }
 
 /* ==========================================
+   결과 카운트
+   ========================================== */
+#resultCount {
+  color: var(--text-hint) !important;
+  font-size: 13px !important;
+  font-weight: 500;
+}
+
+/* ==========================================
    연락처 카드
    ========================================== */
 .contact-card {
-  background-color: var(--tg-theme-secondary-bg-color);
-  transition: transform 0.1s, opacity 0.1s;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(27, 58, 107, 0.06);
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .contact-card:active {
   transform: scale(0.98);
-  opacity: 0.9;
+  box-shadow: 0 1px 4px rgba(27, 58, 107, 0.08);
+}
+
+/* 기관명 */
+.contact-card .font-semibold {
+  color: var(--brand-navy) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+/* 설명 */
+.contact-card [style*="hint-color"] {
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+}
+
+/* 전화번호 */
+.contact-card [style*="link-color"] {
+  color: var(--brand-blue) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
 }
 
 /* 카테고리 배지 */
 .cat-badge {
-  background-color: rgba(36, 129, 204, 0.12);
-  color: var(--tg-theme-link-color);
-  font-size: 10px;
+  background-color: var(--brand-light) !important;
+  color: var(--brand-blue) !important;
+  font-size: 11px !important;
+  font-weight: 600;
+  border: 1px solid rgba(74, 159, 213, 0.3);
 }
 
 /* ==========================================
-   액션 버튼 (전화 / 지도)
+   액션 버튼
    ========================================== */
 .action-btn {
   text-decoration: none;
   transition: transform 0.1s, opacity 0.1s;
+  font-size: 18px !important;
 }
 
 .action-btn:active {
-  transform: scale(0.88);
+  transform: scale(0.85);
 }
 
 .call-btn {
-  background-color: rgba(52, 199, 89, 0.15);
+  background-color: rgba(52, 199, 89, 0.12) !important;
+  border: 1px solid rgba(52, 199, 89, 0.25);
 }
 
 .call-btn:hover {
-  background-color: rgba(52, 199, 89, 0.25);
+  background-color: rgba(52, 199, 89, 0.22) !important;
 }
 
 .map-btn {
-  background-color: rgba(36, 129, 204, 0.12);
+  background-color: rgba(74, 159, 213, 0.12) !important;
+  border: 1px solid rgba(74, 159, 213, 0.25);
 }
 
 .map-btn:hover {
-  background-color: rgba(36, 129, 204, 0.22);
+  background-color: rgba(74, 159, 213, 0.22) !important;
 }
 
 /* ==========================================
@@ -151,8 +195,8 @@ body {
 .spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid var(--tg-theme-secondary-bg-color);
-  border-top-color: var(--tg-theme-button-color);
+  border: 3px solid var(--brand-light);
+  border-top-color: var(--brand-blue);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -162,13 +206,31 @@ body {
 }
 
 /* ==========================================
-   다시 시도 버튼
+   빈 상태 / 오류
    ========================================== */
+#emptyState p:first-child,
+#errorState p:first-child {
+  font-size: 40px;
+}
+
+#emptyState p,
+#errorState p {
+  color: var(--text-primary) !important;
+}
+
+#emptyState p:last-child,
+#errorState p:last-child {
+  color: var(--text-hint) !important;
+  font-size: 14px !important;
+}
+
+/* 다시 시도 버튼 */
 .retry-btn {
-  background-color: var(--tg-theme-button-color);
-  color: var(--tg-theme-button-text-color);
+  background-color: var(--brand-navy) !important;
+  color: #ffffff !important;
   border: none;
   cursor: pointer;
+  font-size: 14px !important;
   transition: opacity 0.2s;
 }
 
@@ -177,7 +239,7 @@ body {
 }
 
 /* ==========================================
-   스크롤 부드럽게
+   기타
    ========================================== */
 html {
   scroll-behavior: smooth;
