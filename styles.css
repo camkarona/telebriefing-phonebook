@@ -89,6 +89,27 @@ html, body {
 }
 
 /* ==========================================
+   안내 문구 배너
+   ========================================== */
+.info-banner {
+  background-color: var(--brand-light);
+  border: 1px solid rgba(74, 159, 213, 0.2);
+}
+
+.info-text {
+  color: var(--brand-navy);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.info-text strong {
+  color: var(--brand-blue);
+  font-weight: 700;
+}
+
+/* ==========================================
    검색창
    ========================================== */
 .search-input {
