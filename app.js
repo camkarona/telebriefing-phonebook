@@ -377,6 +377,15 @@ clearBtn.addEventListener('click', () => {
 });
 
 // ==========================================
+// 키보드 내리기 (검색창 외 다른 곳 탭 시)
+// ==========================================
+document.addEventListener('touchstart', (e) => {
+  if (!e.target.closest('#searchInput') && !e.target.closest('#clearSearch')) {
+    searchInput.blur();
+  }
+}, { passive: true });
+
+// ==========================================
 // 시작
 // ==========================================
 loadData();
