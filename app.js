@@ -1,7 +1,7 @@
 // ==========================================
 // 설정
 // ==========================================
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTVG7qHLYUmPSUdKcuQExcwskxE2Pi76S5Yz42B7EyTAZZ56dUgBBFMGRl_L46iCJTdmK6trX6Z_M7E/pub?gid=0&single=true&output=csv';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTVG7qHLYUmPSUdKcuQExcwskxE2Pi76S5Yz42B7EyTAZZ56dUgBBFMGRl_L46iCJTdmK6trX6Z_M7E/pub?gid=185556541&single=true&output=csv';
 const CACHE_KEY = 'telebriefing_v1_data';
 const CACHE_TIME_KEY = 'telebriefing_v1_time';
 const CACHE_TTL = 1000 * 60 * 30; // 30분
