@@ -7,7 +7,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <link rel="stylesheet" href="styles.css?v=0.4">
+  <link rel="stylesheet" href="styles.css?v=0.5">
 </head>
 <body>
 
@@ -24,7 +24,8 @@
       <!-- 안내 문구 -->
       <div class="info-banner mb-2 px-3 py-2 rounded-xl">
         <p class="info-text">📍 교민업체 <strong>450곳</strong> 등록!</p>
-        <p class="info-text">▼ 클릭으로 분류 선택 · 직접 전화 · 번호 복사 가능</p>
+        <p class="info-text">📞 전화걸기 시 번호가 자동 복사됩니다</p>
+        <p class="info-text">(아이폰: 전화앱에서 붙여넣기)</p>
       </div>
 
       <!-- 검색창 -->
@@ -92,7 +93,7 @@
 
   <!-- 푸터 -->
   <footer class="app-footer text-center py-4 mt-2">
-    <p class="footer-version">ver 0.3</p>
+    <p class="footer-version">ver 0.5</p>
     <p class="footer-dev">Developed by Karona</p>
   </footer>
 
@@ -105,9 +106,9 @@
       <p id="bsPhone" class="bs-phone"></p>
     </div>
     <div class="bs-actions">
-      <a id="bsCallBtn" class="bs-btn bs-call" href="#" onclick="bottomSheetCallTrack()">
+      <a id="bsCallBtn" class="bs-btn bs-call" href="#" onclick="bottomSheetCallTrack(event)">
         <span class="bs-icon">📞</span>
-        <span>전화 걸기</span>
+        <span>전화 걸기<small class="bs-sub">+자동복사</small></span>
       </a>
       <button id="bsCopyBtn" class="bs-btn bs-copy" onclick="bottomSheetCopy()">
         <span class="bs-icon">📋</span>
@@ -117,6 +118,6 @@
     <button class="bs-cancel" onclick="closeBottomSheet()">취소</button>
   </div>
 
-  <script src="app.js?v=0.4"></script>
+  <script src="app.js?v=0.5"></script>
 </body>
 </html>

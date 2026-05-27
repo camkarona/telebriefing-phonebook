@@ -320,6 +320,14 @@ html, body {
   line-height: 1;
 }
 
+.bs-sub {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
 .bs-call {
   background: rgba(52, 199, 89, 0.12);
   color: #1a7a35;

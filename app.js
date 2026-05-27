@@ -237,12 +237,31 @@ function closeBottomSheet() {
   document.getElementById('bottomSheet').classList.remove('active');
 }
 
-// <a> 태그가 OS에 직접 tel: 전달, 햅틱만 트리거
-function bottomSheetCallTrack() {
+// 전화걸기 시도 + 자동 복사 (iOS Telegram WebView 호환)
+function bottomSheetCallTrack(e) {
   haptic();
-  // 시트는 살짝 뒤에 닫기 (네이티브 동작 방해 X)
-  setTimeout(closeBottomSheet, 300);
-  // return true로 기본 동작(href 이동) 허용
+  const tel = _bsTelPhone;
+  const display = _bsDisplayPhone;
+
+  // 1) 항상 복사 먼저 (안전망)
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(display).catch(() => {});
+  }
+
+  // 2) Telegram openLink로 외부 브라우저 시도
+  try {
+    if (tg && tg.openLink) {
+      tg.openLink('tel:' + tel);
+    }
+  } catch (err) {}
+
+  // 3) <a href="tel:"> 기본 동작도 같이 (안드로이드는 동작)
+  // (e.preventDefault() 안 호출하므로 href 이동 시도됨)
+
+  setTimeout(() => {
+    closeBottomSheet();
+    showToast('번호 복사됨! 전화앱에서 붙여넣기 가능');
+  }, 200);
 }
 
 function bottomSheetCopy() {
