@@ -85,34 +85,29 @@ let currentCategory = 'all';
 let currentQuery = '';
 
 // ==========================================
-// 카테고리 탭 렌더링
+// 카테고리 드롭다운 렌더링
 // ==========================================
 function renderCategoryTabs() {
   const usedCodes = new Set(allData.map(r => r.category?.trim()).filter(Boolean));
-  const tabs = CATEGORIES.filter(c => c.code === 'all' || usedCodes.has(c.code));
+  const cats = CATEGORIES.filter(c => c.code === 'all' || usedCodes.has(c.code));
 
-  const container = document.getElementById('categoryTabs');
-  container.innerHTML = tabs.map(cat => `
-    <button
-      class="category-tab flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${currentCategory === cat.code ? 'tab-active' : 'tab-inactive'}"
-      data-code="${cat.code}"
-    >${cat.label}</button>
+  const select = document.getElementById('categorySelect');
+  select.innerHTML = cats.map(cat => `
+    <option value="${cat.code}" ${currentCategory === cat.code ? 'selected' : ''}>
+      ${cat.code === 'all' ? '📋 전체 보기' : cat.label}
+    </option>
   `).join('');
 
-  container.querySelectorAll('.category-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      haptic();
-      selectCategory(btn.dataset.code);
-    });
+  select.addEventListener('change', () => {
+    haptic();
+    selectCategory(select.value);
   });
 }
 
 function selectCategory(code) {
   currentCategory = code;
-  document.querySelectorAll('.category-tab').forEach(btn => {
-    const active = btn.dataset.code === code;
-    btn.className = `category-tab flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${active ? 'tab-active' : 'tab-inactive'}`;
-  });
+  const select = document.getElementById('categorySelect');
+  if (select) select.value = code;
   renderList();
 }
 

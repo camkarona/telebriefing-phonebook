@@ -40,9 +40,14 @@
       </div>
     </div>
 
-    <!-- 카테고리 탭 -->
-    <div id="categoryTabs" class="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
-      <!-- JS에서 생성 -->
+    <!-- 카테고리 드롭다운 -->
+    <div class="px-4 pb-3">
+      <div class="category-select-wrap relative">
+        <select id="categorySelect" class="category-select w-full px-4 py-2 pr-8 rounded-xl text-sm font-medium appearance-none cursor-pointer outline-none">
+          <!-- JS에서 생성 -->
+        </select>
+        <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm">▼</span>
+      </div>
     </div>
   </header>
 
