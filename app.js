@@ -116,6 +116,24 @@ function selectCategory(code) {
 }
 
 // ==========================================
+// 같은 이름의 항목을 하나의 카드로 그룹핑
+// ==========================================
+function groupByName(rows) {
+  const map = new Map();
+  rows.forEach(row => {
+    const key = `${row.name?.trim()}__${row.category?.trim()}`;
+    if (!map.has(key)) {
+      map.set(key, { ...row, phones: [] });
+    }
+    const phone = (row.phone || '').trim();
+    if (phone && !map.get(key).phones.includes(phone)) {
+      map.get(key).phones.push(phone);
+    }
+  });
+  return Array.from(map.values());
+}
+
+// ==========================================
 // 연락처 카드 렌더링
 // ==========================================
 function renderList() {
@@ -137,10 +155,13 @@ function renderList() {
     );
   }
 
-  // 결과 카운트
-  countEl.textContent = filtered.length > 0 ? `총 ${filtered.length}개` : '';
+  // 이름별로 그룹핑 (같은 기관 = 카드 1개)
+  const grouped = groupByName(filtered);
 
-  if (filtered.length === 0) {
+  // 결과 카운트
+  countEl.textContent = grouped.length > 0 ? `총 ${grouped.length}개` : '';
+
+  if (grouped.length === 0) {
     list.classList.add('hidden');
     empty.classList.remove('hidden');
     return;
@@ -149,13 +170,25 @@ function renderList() {
   list.classList.remove('hidden');
   empty.classList.add('hidden');
 
-  list.innerHTML = filtered.map(item => {
-    const phone = (item.phone || '').trim();
-    const telPhone = phone.replace(/[\s-]/g, '');
+  list.innerHTML = grouped.map(item => {
     const hasMap = (item.map_url || '').trim().length > 0;
-
     const catInfo = CATEGORIES.find(c => c.code === item.category?.trim());
     const catLabel = catInfo ? catInfo.label : (item.category || '');
+
+    // 전화번호 여러 개일 때 각각 버튼 생성
+    const phoneButtons = item.phones.map((phone, idx) => {
+      const telPhone = phone.replace(/[\s-]/g, '');
+      return `
+        <div class="flex items-center justify-between mt-${idx === 0 ? '1.5' : '1'} gap-2">
+          <span class="text-xs font-medium" style="color: var(--tg-theme-link-color)">${escapeHtml(phone)}</span>
+          <a href="tel:${telPhone}"
+             class="action-btn call-btn flex items-center justify-center w-8 h-8 rounded-xl text-base flex-shrink-0"
+             onclick="haptic()">
+            📞
+          </a>
+        </div>
+      `;
+    }).join('');
 
     return `
     <div class="contact-card rounded-2xl p-3.5">
@@ -165,24 +198,15 @@ function renderList() {
             <p class="font-semibold text-sm leading-snug" style="color: var(--tg-theme-text-color)">${escapeHtml(item.name)}</p>
             ${catLabel && currentCategory === 'all' ? `<span class="cat-badge text-xs px-1.5 py-0.5 rounded-md">${catLabel}</span>` : ''}
           </div>
-          ${item.description ? `<p class="text-xs mt-0.5 truncate" style="color: var(--tg-theme-hint-color)">${escapeHtml(item.description)}</p>` : ''}
-          ${phone ? `<p class="text-xs mt-1 font-medium" style="color: var(--tg-theme-link-color)">${escapeHtml(phone)}</p>` : ''}
+          ${item.description ? `<p class="text-xs mt-0.5" style="color: var(--tg-theme-hint-color)">${escapeHtml(item.description)}</p>` : ''}
+          ${phoneButtons}
         </div>
-        <div class="flex gap-2 flex-shrink-0 mt-0.5">
-          ${phone ? `
-            <a href="tel:${telPhone}"
-               class="action-btn call-btn flex items-center justify-center w-10 h-10 rounded-xl text-lg"
-               onclick="haptic()">
-              📞
-            </a>
-          ` : ''}
-          ${hasMap ? `
-            <a href="${escapeHtml(item.map_url)}" target="_blank" rel="noopener"
-               class="action-btn map-btn flex items-center justify-center w-10 h-10 rounded-xl text-lg">
-              📍
-            </a>
-          ` : ''}
-        </div>
+        ${hasMap ? `
+          <a href="${escapeHtml(item.map_url)}" target="_blank" rel="noopener"
+             class="action-btn map-btn flex items-center justify-center w-10 h-10 rounded-xl text-lg flex-shrink-0 mt-0.5">
+            📍
+          </a>
+        ` : ''}
       </div>
     </div>
     `;
