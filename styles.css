@@ -46,23 +46,24 @@ html, body {
 
 /* 로고 */
 .header-logo {
-  width: 36px;
-  height: 36px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 12px;
   flex-shrink: 0;
 }
 
 /* 헤더 타이틀 */
-.app-header h1 {
+.header-title {
   color: var(--brand-navy) !important;
-  font-size: 17px !important;
+  font-size: 26px !important;
   font-weight: 800 !important;
+  letter-spacing: -0.3px;
 }
 
 .header-sub {
   color: var(--brand-blue) !important;
-  font-size: 11px !important;
+  font-size: 14px !important;
   font-weight: 500;
 }
 
