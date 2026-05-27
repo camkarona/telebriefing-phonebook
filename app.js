@@ -177,15 +177,13 @@ function renderList() {
       return `
         <div class="flex items-center justify-between mt-${idx === 0 ? '1.5' : '1'} gap-2">
           <span class="phone-number-link text-xs font-medium"
-                onclick="copyPhone('${telPhone}', '${escapeHtml(phone)}')">
+                onclick="copyPhone('${telPhone}', '${escapeHtml(phone)}', '${escapeHtml(item.name)}')">
             ${escapeHtml(phone)}
-            <span class="copy-hint">터치하여 복사</span>
           </span>
-          <a href="tel:${telPhone}"
-             class="action-btn call-btn flex items-center justify-center w-8 h-8 rounded-xl text-base flex-shrink-0"
-             onclick="haptic()">
+          <button class="action-btn call-btn flex items-center justify-center w-8 h-8 rounded-xl text-base flex-shrink-0"
+             onclick="copyPhone('${telPhone}', '${escapeHtml(phone)}', '${escapeHtml(item.name)}')">
             📞
-          </a>
+          </button>
         </div>
       `;
     }).join('');
@@ -214,29 +212,51 @@ function renderList() {
 }
 
 // ==========================================
-// 전화번호 복사
+// 바텀시트
 // ==========================================
-function copyPhone(telPhone, displayPhone) {
-  haptic();
-  const text = displayPhone || telPhone;
+let _bsTelPhone = '';
+let _bsDisplayPhone = '';
 
-  // 클립보드 복사 시도
+function copyPhone(telPhone, displayPhone, name) {
+  haptic();
+  _bsTelPhone = telPhone;
+  _bsDisplayPhone = displayPhone || telPhone;
+
+  document.getElementById('bsName').textContent = name || '';
+  document.getElementById('bsPhone').textContent = _bsDisplayPhone;
+
+  document.getElementById('bottomSheetOverlay').classList.add('active');
+  document.getElementById('bottomSheet').classList.add('active');
+}
+
+function closeBottomSheet() {
+  document.getElementById('bottomSheetOverlay').classList.remove('active');
+  document.getElementById('bottomSheet').classList.remove('active');
+}
+
+function bottomSheetCall() {
+  haptic();
+  closeBottomSheet();
+  // 텔레그램 미니앱에서 전화 걸기
+  setTimeout(() => {
+    window.location.href = 'tel:' + _bsTelPhone;
+  }, 200);
+}
+
+function bottomSheetCopy() {
+  haptic();
+  closeBottomSheet();
+  const text = _bsDisplayPhone;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => showToast(text));
   } else {
-    // 구형 방식 fallback
     const el = document.createElement('textarea');
     el.value = text;
     el.style.position = 'fixed';
     el.style.opacity = '0';
     document.body.appendChild(el);
     el.select();
-    try {
-      document.execCommand('copy');
-      showToast(text);
-    } catch (e) {
-      showToast(text, false);
-    }
+    try { document.execCommand('copy'); showToast(text); } catch (e) {}
     document.body.removeChild(el);
   }
 }

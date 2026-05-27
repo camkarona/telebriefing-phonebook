@@ -96,6 +96,27 @@
     <p class="footer-dev">Developed by Karona</p>
   </footer>
 
+  <!-- 바텀시트 -->
+  <div id="bottomSheetOverlay" class="bs-overlay" onclick="closeBottomSheet()"></div>
+  <div id="bottomSheet" class="bottom-sheet">
+    <div class="bs-handle"></div>
+    <div class="bs-info">
+      <p id="bsName" class="bs-name"></p>
+      <p id="bsPhone" class="bs-phone"></p>
+    </div>
+    <div class="bs-actions">
+      <button id="bsCallBtn" class="bs-btn bs-call" onclick="bottomSheetCall()">
+        <span class="bs-icon">📞</span>
+        <span>전화 걸기</span>
+      </button>
+      <button id="bsCopyBtn" class="bs-btn bs-copy" onclick="bottomSheetCopy()">
+        <span class="bs-icon">📋</span>
+        <span>번호 복사</span>
+      </button>
+    </div>
+    <button class="bs-cancel" onclick="closeBottomSheet()">취소</button>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
