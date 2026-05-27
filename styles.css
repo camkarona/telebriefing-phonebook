@@ -44,17 +44,48 @@ html, body {
   box-shadow: 0 2px 12px rgba(27, 58, 107, 0.08);
 }
 
+/* 로고 */
+.header-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 /* 헤더 타이틀 */
 .app-header h1 {
   color: var(--brand-navy) !important;
-  font-size: 18px !important;
+  font-size: 17px !important;
   font-weight: 800 !important;
 }
 
-.app-header p {
+.header-sub {
   color: var(--brand-blue) !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 500;
+}
+
+/* ==========================================
+   푸터
+   ========================================== */
+.app-footer {
+  border-top: 1px solid var(--border);
+  padding-bottom: 24px;
+}
+
+.footer-version {
+  color: var(--text-hint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.footer-dev {
+  color: var(--text-hint);
+  font-size: 11px;
+  margin-top: 2px;
+  opacity: 0.7;
 }
 
 /* ==========================================
