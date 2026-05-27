@@ -176,7 +176,9 @@ function renderList() {
       const telPhone = phone.replace(/[\s-]/g, '');
       return `
         <div class="flex items-center justify-between mt-${idx === 0 ? '1.5' : '1'} gap-2">
-          <span class="text-xs font-medium" style="color: var(--tg-theme-link-color)">${escapeHtml(phone)}</span>
+          <a href="tel:${telPhone}" class="phone-number-link text-xs font-medium" onclick="haptic()">
+            ${escapeHtml(phone)}
+          </a>
           <a href="tel:${telPhone}"
              class="action-btn call-btn flex items-center justify-center w-8 h-8 rounded-xl text-base flex-shrink-0"
              onclick="haptic()">
