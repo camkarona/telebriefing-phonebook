@@ -225,6 +225,9 @@ function copyPhone(telPhone, displayPhone, name) {
   document.getElementById('bsName').textContent = name || '';
   document.getElementById('bsPhone').textContent = _bsDisplayPhone;
 
+  // 진짜 tel: 링크로 href 설정 (OS가 직접 처리하도록)
+  document.getElementById('bsCallBtn').href = 'tel:' + telPhone;
+
   document.getElementById('bottomSheetOverlay').classList.add('active');
   document.getElementById('bottomSheet').classList.add('active');
 }
@@ -234,13 +237,12 @@ function closeBottomSheet() {
   document.getElementById('bottomSheet').classList.remove('active');
 }
 
-function bottomSheetCall() {
+// <a> 태그가 OS에 직접 tel: 전달, 햅틱만 트리거
+function bottomSheetCallTrack() {
   haptic();
-  closeBottomSheet();
-  // 텔레그램 미니앱에서 전화 걸기
-  setTimeout(() => {
-    window.location.href = 'tel:' + _bsTelPhone;
-  }, 200);
+  // 시트는 살짝 뒤에 닫기 (네이티브 동작 방해 X)
+  setTimeout(closeBottomSheet, 300);
+  // return true로 기본 동작(href 이동) 허용
 }
 
 function bottomSheetCopy() {

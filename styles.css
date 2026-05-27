@@ -307,6 +307,7 @@ html, body {
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  text-decoration: none;
   transition: opacity 0.15s, transform 0.15s;
 }
 .bs-btn:active {
