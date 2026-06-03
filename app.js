@@ -17,6 +17,7 @@ const CATEGORIES = [
   { code: 'construction',  label: '건설·전기' },
   { code: 'realestate',    label: '부동산' },
   { code: 'farm',          label: '농장·농업' },
+  { code: 'argi',          label: '농업' },
   { code: 'logistics',     label: '차량·물류' },
   { code: 'food_dist',     label: '식품·유통' },
   { code: 'medical',       label: '병원·약국' },
